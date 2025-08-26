@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Risk Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            grid-column: 1 / -1;
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #9a9a9a;
+            font-size: 1.1em;
+        }
+        .card {
+            background-color: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .metric-card h3 {
+            color: #a0a0a0;
+            font-size: 1em;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+        }
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #0f3460;
+        }
+        .metric-card .value.green { color: #50c878; }
+        .metric-card .value.red { color: #e94560; }
+        .chart-card {
+            grid-column: span 2;
+        }
+        @media (max-width: 768px) {
+            .chart-card { grid-column: span 1; }
+        }
+        .table-container {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background-color: #e94560;
+            color: #ffffff;
+        }
+        tr:nth-child(even) {
+            background-color: #1f2a47;
+        }
+        .commentary {
+            grid-column: 1 / -1;
+            background-color: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .commentary h2 {
+            color: #e94560;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Loan Risk Analysis Dashboard</h1>
+    </div>
+
+    <div class="container">
+        <!-- Metric Cards -->
+        <div class="card metric-card">
+            <h3>Total Applicants</h3>
+            <p class="value" style="color: #e0e0e0;">10000</p>
+        </div>
+        <div class="card metric-card">
+            <h3>Overall Risk Percentage</h3>
+            <p class="value red">16.87%</p>
+        </div>
+        <div class="card metric-card">
+            <h3>Average Annual Income</h3>
+            <p class="value" style="color: #e0e0e0;">$84,427</p>
+        </div>
+        <div class="card metric-card">
+            <h3>Model Accuracy</h3>
+            <p class="value green">98.76%</p>
+        </div>
+
+        <!-- Charts -->
+        <div class="card chart-card">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+        <div class="card chart-card">
+            <canvas id="featureImportanceChart"></canvas>
+        </div>
+        <div class="card chart-card">
+            <canvas id="incomeDistributionChart"></canvas>
+        </div>
+        <div class="card chart-card">
+            <canvas id="ageDistributionChart"></canvas>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card table-container">
+            <h3>Sample Applicant Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Age</th><th>Annual Income</th><th>Loan Amount</th><th>Years Employed</th><th>Dependents</th><th>Credit History</th><th>Risk Flag</th>
+                    </tr>
+                </thead>
+                <tbody id="sample-data-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Commentary -->
+        <div class="commentary">
+            <h2>Key Insights & Commentary</h2>
+            <ul>
+                <li><strong>Class Imbalance:</strong> The dataset shows a significant imbalance, with only 16.87% of loans flagged as risky. This can make it challenging for models to learn the patterns of the minority class. Using techniques like `class_weight='balanced'` in the model helps mitigate this.</li>
+                <li><strong>Model Performance:</strong> The Random Forest model achieved an accuracy of <strong>98.76%</strong> on the unseen test data, showing a strong ability to distinguish between safe and risky applicants.</li>
+                <li><strong>Key Predictive Features:</strong> The most influential factors in predicting loan risk are <strong>Credit_History</strong> and <strong>Loan_to_Income_Ratio</strong>. Applicants with lower incomes and higher loan-to-income ratios are more likely to be flagged as high-risk.</li>
+                 <li><strong>Income and Risk:</strong> As seen in the income distribution chart, the median income for applicants flagged as 'Risky' tends to be lower than for those flagged as 'Safe', reinforcing the importance of income as a predictive feature.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const dashboardData = {"total_applicants": 10000, "risk_percentage": 16.87, "avg_income": 84427, "accuracy": 98.76, "risk_dist": {"0": 8313, "1": 1687}, "feature_importance": [{"feature": "Credit_History", "importance": 0.2881909127578933}, {"feature": "Loan_to_Income_Ratio", "importance": 0.21341887610809818}, {"feature": "Loan_Amount", "importance": 0.19997827778502278}, {"feature": "Annual_Income", "importance": 0.17162528002143018}, {"feature": "Years_Employed", "importance": 0.10971838288579341}, {"feature": "Age", "importance": 0.012427520212309405}, {"feature": "Dependents", "importance": 0.004640750229452783}], "age_dist": {"18": 201, "19": 221, "20": 206, "21": 212, "22": 204, "23": 212, "24": 188, "25": 214, "26": 203, "27": 201, "28": 212, "29": 222, "30": 225, "31": 197, "32": 215, "33": 207, "34": 234, "35": 228, "36": 205, "37": 214, "38": 223, "39": 219, "40": 235, "41": 216, "42": 221, "43": 242, "44": 176, "45": 233, "46": 225, "47": 203, "48": 177, "49": 219, "50": 208, "51": 218, "52": 226, "53": 209, "54": 223, "55": 204, "56": 227, "57": 212, "58": 191, "59": 222, "60": 190, "61": 210, "62": 231, "63": 191, "64": 228}, "income_by_risk_safe": [52872, 79875, 63923, 136519, 121248, 44194, 140288, 86084, 20916, 134614, 138446, 141401, 114003, 101720, 81401, 58699, 70624, 62299, 90229, 67387, 72328, 47916, 146031, 120364, 75420, 77623, 93567, 32419, 60324, 46485, 74240, 115022, 145332, 56135, 33566, 122305, 117047, 61534, 31143, 64040, 30435, 110787, 107851, 31467, 129525, 66840, 115634, 128953, 102667, 102910, 141412, 148131, 92036, 113059, 99409, 53038, 118750, 144786, 112085, 63714, 56126, 47370, 109541, 28498, 40872, 89103, 74261, 60721, 25452, 32877, 96034, 79136, 47293, 149576, 102015, 136957, 137225, 53431, 119276, 51500, 143279, 93029, 46797, 104120, 121536, 126683, 115739, 125940, 37408, 112199, 102001, 97442, 104101, 68351, 108241, 120181, 95752, 142790, 44723, 125454, 53617, 26389, 35591, 146733, 137110, 97582, 126794, 100337, 33285, 99360, 102681, 131654, 108593, 38013, 113433, 22243, 68791, 65312, 118297, 51153, 145648, 92914, 63098, 92105, 89110, 64111, 75598, 76063, 55650, 129419, 75240, 139746, 138706, 51976, 48715, 50505, 56519, 78420, 135131, 95287, 111384, 47201, 133766, 79618, 20211, 75828, 97188, 123080, 21778, 66910, 99993, 117911, 92358, 131910, 41468, 101527, 87381, 85092, 89385, 70278, 55109, 47425, 42369, 48460, 45156, 67037, 41514, 56996, 110998, 121799, 144444, 143182, 124162, 47757, 136452, 112510, 29475, 68239, 34178, 147236, 30236, 33621, 106555, 125372, 135762, 69262, 47114, 57297, 76354, 145626, 114482, 126305, 48400, 92154, 83427, 144467, 83308, 114409, 44276, 56679, 83176, 29436, 46309, 120931, 51509, 42745, 93167, 118829, 133135, 35522, 63246, 100691, 40529, 63060, 84204, 80261, 24611, 82537, 99923, 118636, 127334, 96008, 104422, 107211, 70969, 47503, 137270, 79900, 146745, 104358, 40239, 65891, 75186, 68929, 87650, 31009, 41825, 50020, 100731, 117349, 27897, 91326, 144604, 142408, 25594, 80998, 84666, 87388, 135481, 123022, 62425, 92089, 51668, 32612, 71977, 96860, 129654, 47659, 124429, 100840, 95787, 99118, 70547, 41946, 38030, 72927, 28382, 46296, 86126, 134579, 24383, 97112, 45298, 61400, 93914, 84947, 34037, 82471, 83593, 125623, 65986, 65950, 138211, 88344, 134234, 98590, 28043, 134462, 136406, 109342, 133437, 146610, 83238, 61521, 97061, 80598, 47378, 62770, 66246, 24076, 145919, 137035, 115852, 44312, 140048, 49960, 29425, 121226, 22921, 144243, 109682, 90043, 98678, 99198, 148668, 22810, 77771, 70708, 75059, 91524, 30681, 66359, 134280, 43798, 53205, 130078, 59015, 52328, 145613, 31419, 43301, 92894, 115899, 54404, 105782, 70945, 113608, 96120, 80523, 79940, 58218, 71370, 116925, 49048, 136750, 75673, 100140, 76115, 73839, 80721, 105848, 139004, 90290, 145615, 61011, 91062, 109407, 97214, 95542, 69854, 44496, 35797, 78445, 115351, 83620, 135266, 148022, 86912, 91548, 93401, 85839, 142658, 72482, 92869, 127042, 126073, 39323, 74645, 45738, 101397, 62722, 32941, 113740, 93251, 122004, 68231, 98860, 125494, 69777, 149177, 149453, 99777, 86836, 141939, 42462, 96095, 93058, 119500, 35295, 92976, 143217, 46539, 64028, 93501, 51821, 94727, 57180, 147922, 121092, 68365, 70807, 60403, 54831, 130012, 64721, 94723], "income_by_risk_risky": [32823, 94451, 120808, 39523, 33311, 21949, 38316, 24747, 37629, 82796, 88578, 132684, 37153, 33541, 45595, 80252, 93616, 112498, 85350, 29428, 31882, 41494, 29290, 78382, 129879, 52250, 30663, 26749, 99876, 26820, 26908, 31002, 27904, 34263, 47050, 27549, 22419, 92657, 103265, 35329, 23736, 26057, 23747, 42796, 22093, 138992, 131872, 78013, 138329, 20246, 93839, 130777, 21403, 145813, 83589, 132073, 113464, 31390, 60597, 30892, 25914, 77427, 26840, 39522, 140759, 107710, 145144, 27446, 141943, 135472, 39971, 113449, 23770, 141323, 36292, 47280, 49756, 95145, 30686, 26862, 51770, 34551, 23339, 92354, 45651, 24414, 25167, 29321, 27086, 21286, 86729, 125193, 25239, 29821, 127938, 102486, 102629, 67734, 29664, 46014, 28176, 104743, 30346, 106457, 37600, 24096, 58311, 32834, 134246, 58294, 38687, 25969, 137718, 24841, 28625, 25813, 111494, 94967, 21789, 82670, 143794, 134286, 41770, 32213, 27711, 21502, 27140, 149502, 118421, 20022, 25054, 31170, 87445, 122439, 63148, 139398, 32809, 39416, 23688, 123912, 24642, 43396, 24429, 86330, 83165, 31672, 58097, 27425, 146115, 148156, 20443, 36442, 89180, 32906, 29471, 125280, 56007, 31929, 148256, 41563, 27507, 44151, 41604, 27887, 64498, 26044, 78235, 24239, 29335, 39491, 123909, 25028, 20840, 128001, 39333, 30447, 69607, 90678, 137679, 25149, 93438, 26265, 36108, 72076, 111735, 26333, 23598, 62816, 34690, 116623, 102172, 38526, 93339, 29308, 31596, 32213, 29569, 38680, 34633, 103704, 35261, 36105, 59107, 27903, 37868, 79263, 79119, 38066, 25192, 32460, 133197, 30360, 148180, 132013, 106120, 23307, 28163, 38452, 108087, 104124, 34193, 38781, 45874, 25008, 74816, 24478, 28512, 54129, 25543, 37215, 29745, 45557, 34260, 32985, 102702, 36979, 44240, 67249, 100781, 36220, 137836, 36350, 85782, 23199, 79414, 91873, 112290, 110179, 110005, 22365, 27240, 107359, 102025, 61848, 37939, 24722, 129606, 34002, 29901, 21408, 138458, 99803, 68581, 22654, 58785, 44464, 36292, 134695, 100781, 97798, 22024, 83908, 113517, 84315, 31278, 23925, 146250, 54262, 90412, 38895, 83303, 134915, 114238, 23956, 27689, 105779, 112116, 120543, 114542, 121681, 125504, 99459, 36490, 72800, 23515, 20760, 27235, 99062, 43466, 31885, 21701, 20244, 63952, 22431, 113619, 127697, 125155, 95214, 24947, 72805, 32771, 20442, 25445, 85129, 36347, 22459, 39727, 82539, 42063, 39346, 112044, 148714, 41695, 24901, 35554, 87507, 81855, 69581, 94005, 139256, 123613, 35624, 34407, 128556, 140640, 57921, 123996, 75200], "sample_data": [{"Age": 35, "Annual_Income": 52872, "Loan_Amount": 7661, "Years_Employed": 33, "Dependents": 0, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.1448971100015131}, {"Age": 34, "Annual_Income": 59199, "Loan_Amount": 48717, "Years_Employed": 5, "Dependents": 4, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.822936198246592}, {"Age": 39, "Annual_Income": 85020, "Loan_Amount": 9769, "Years_Employed": 6, "Dependents": 0, "Credit_History": 0, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.11490237591155023}, {"Age": 45, "Annual_Income": 73974, "Loan_Amount": 15387, "Years_Employed": 33, "Dependents": 1, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.2080055154513748}, {"Age": 60, "Annual_Income": 90864, "Loan_Amount": 11145, "Years_Employed": 32, "Dependents": 4, "Credit_History": 0, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.12265583729529847}, {"Age": 63, "Annual_Income": 95088, "Loan_Amount": 14343, "Years_Employed": 35, "Dependents": 3, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.15083922261484098}, {"Age": 27, "Annual_Income": 123169, "Loan_Amount": 32317, "Years_Employed": 2, "Dependents": 0, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.2623793324619019}, {"Age": 26, "Annual_Income": 27219, "Loan_Amount": 10917, "Years_Employed": 38, "Dependents": 1, "Credit_History": 1, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.4010801278518682}, {"Age": 51, "Annual_Income": 32823, "Loan_Amount": 33394, "Years_Employed": 31, "Dependents": 1, "Credit_History": 1, "Risk_Flag": 1, "Loan_to_Income_Ratio": 1.017396337933766}, {"Age": 54, "Annual_Income": 72870, "Loan_Amount": 17143, "Years_Employed": 17, "Dependents": 1, "Credit_History": 0, "Risk_Flag": 0, "Loan_to_Income_Ratio": 0.23525456292026897}]};
+
+        // 1. Risk Distribution Chart (Pie)
+        const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+        new Chart(riskCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Safe (0)', 'Risky (1)'],
+                datasets: [{
+                    label: 'Loan Risk Distribution',
+                    data: [dashboardData.risk_dist[0], dashboardData.risk_dist[1]],
+                    backgroundColor: ['#50c878', '#e94560']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Distribution of Loan Risk Flags', color: '#e0e0e0', font: { size: 16 } },
+                    legend: { labels: { color: '#e0e0e0' } }
+                }
+            }
+        });
+
+        // 2. Feature Importance Chart (Bar)
+        const featureCtx = document.getElementById('featureImportanceChart').getContext('2d');
+        new Chart(featureCtx, {
+            type: 'bar',
+            data: {
+                labels: dashboardData.feature_importance.map(item => item.feature),
+                datasets: [{
+                    label: 'Importance',
+                    data: dashboardData.feature_importance.map(item => item.importance),
+                    backgroundColor: '#0f3460'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Top Predictive Features for Loan Risk', color: '#e0e0e0', font: { size: 16 } },
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: '#e0e0e0' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#e0e0e0' }, grid: { color: '#333' } }
+                }
+            }
+        });
+        
+        // 3. Income Distribution by Risk (Box Plot)
+        const incomeCtx = document.getElementById('incomeDistributionChart').getContext('2d');
+        new Chart(incomeCtx, {
+            type: 'boxplot',
+             data: {
+                labels: ['Safe', 'Risky'],
+                datasets: [{
+                    label: 'Annual Income Distribution',
+                    data: [dashboardData.income_by_risk_safe, dashboardData.income_by_risk_risky],
+                    backgroundColor: ['rgba(80, 200, 120, 0.5)', 'rgba(233, 69, 96, 0.5)'],
+                    borderColor: ['#50c878', '#e94560'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Annual Income Distribution by Risk Flag', color: '#e0e0e0', font: { size: 16 } },
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: '#e0e0e0' }, grid: { color: '#333' } },
+                    y: { ticks: { color: '#e0e0e0' }, grid: { color: '#333' } }
+                }
+            }
+        });
+
+        // 4. Age Distribution Chart (Line)
+        const ageCtx = document.getElementById('ageDistributionChart').getContext('2d');
+        new Chart(ageCtx, {
+            type: 'line',
+            data: {
+                labels: Object.keys(dashboardData.age_dist),
+                datasets: [{
+                    label: 'Number of Applicants',
+                    data: Object.values(dashboardData.age_dist),
+                    borderColor: '#e94560',
+                    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Age Distribution of Applicants', color: '#e0e0e0', font: { size: 16 } },
+                     legend: { display: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Age', color: '#a0a0a0'}, ticks: { color: '#e0e0e0' }, grid: { color: '#333' } },
+                    y: { title: { display: true, text: 'Count', color: '#a0a0a0'}, ticks: { color: '#e0e0e0' }, grid: { color: '#333' } }
+                }
+            }
+        });
+
+        // Populate Sample Data Table
+        const tableBody = document.getElementById('sample-data-body');
+        dashboardData.sample_data.forEach(row => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.Age}</td><td>${row.Annual_Income}</td><td>${row.Loan_Amount}</td><td>${row.Years_Employed}</td><td>${row.Dependents}</td><td>${row.Credit_History === 1 ? 'Yes' : 'No'}</td><td>${row.Risk_Flag}</td>`;
+            tableBody.appendChild(tr);
+        });
+    </script>
+    <script src="https://unpkg.com/chart.js-chart-box-and-violin-plot/build/Chart.BoxPlot.js"></script>
+</body>
+</html>
