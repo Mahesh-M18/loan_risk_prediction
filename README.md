@@ -58,28 +58,28 @@ loan_risk_prediction/
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the repository
-```bash
+bash
 git clone https://github.com/Mahesh-M18/loan_risk_prediction.git
 cd loan_risk_prediction
 
-2. Create a virtual environment
+### 2. Create a virtual environment
 
 python -m venv venv
 source venv/bin/activate  # For Linux/Mac
 venv\Scripts\activate     # For Windows
 
-3. Install dependencies
+### 3. Install dependencies
 pip install -r requirements.txt
 
-4. Train and save model (if not already available)
+### 4. Train and save model (if not already available)
 jupyter notebook loan_prediction.ipynb
 
-5. Run the Streamlit app
+### 5. Run the Streamlit app
 streamlit run app.py
 
 App will run at: http://127.0.0.1:8501/
 
-📊 Results
+### 📊 Results
 
 Logistic Regression Accuracy: ~79.8% ✅ (Best Model)
 
@@ -92,7 +92,7 @@ XGBoost: ~78.3%
 
 
 
-🎯 Future Enhancements
+### 🎯 Future Enhancements
 
 Hyperparameter tuning for better accuracy
 
@@ -107,7 +107,7 @@ Support for batch predictions via CSV upload
 
 
 
-🤝 Contributing
+### 🤝 Contributing
 
 We welcome contributions! To contribute:
 
@@ -124,10 +124,9 @@ Push to your fork and create a Pull Request
 
 
 
-📬 Contact & Credits
+### 📬 Contact & Credits
 
 Developed by
-
-Mahesh M – GitHub
+- Mahesh M – [GitHub](https://github.com/Mahesh-M18)
 
 Collaborators welcome!
