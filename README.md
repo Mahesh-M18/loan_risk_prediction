@@ -58,71 +58,56 @@ loan_risk_prediction/
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the repository
-bash
+```bash
 git clone https://github.com/Mahesh-M18/loan_risk_prediction.git
 cd loan_risk_prediction
-
+```
 ### 2. Create a virtual environment
-
+```bash
 python -m venv venv
 source venv/bin/activate  # For Linux/Mac
 venv\Scripts\activate     # For Windows
-
+```
 ### 3. Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 ### 4. Train and save model (if not already available)
+```bash
 jupyter notebook loan_prediction.ipynb
-
+```
 ### 5. Run the Streamlit app
+```bash
 streamlit run app.py
-
+```
 App will run at: http://127.0.0.1:8501/
 
-### 📊 Results
+## 📊 Results
 
-Logistic Regression Accuracy: ~79.8% ✅ (Best Model)
-
-Random Forest: ~78.3%
-
-Gradient Boosting: ~77.8%
-
-XGBoost: ~78.3%
+- Logistic Regression Accuracy: ~79.8% ✅ (Best Model)
+- Random Forest: ~78.3%
+- Gradient Boosting: ~77.8%
+- XGBoost: ~78.3%
 
 
 
 
-### 🎯 Future Enhancements
+## 🎯 Future Enhancements
 
-Hyperparameter tuning for better accuracy
-
-Deployment on cloud platforms (Heroku, Render, Streamlit Cloud)
-
-Advanced feature engineering
-
-Model explainability (SHAP/feature importance)
-
-Support for batch predictions via CSV upload
+- Hyperparameter tuning for better accuracy
+- Deployment on cloud platforms (Heroku, Render, Streamlit Cloud)
+- Advanced feature engineering
+- Model explainability (SHAP/feature importance)
+- Support for batch predictions via CSV upload
 
 
+## 🤝 Contributing
 
-
-### 🤝 Contributing
-
-We welcome contributions! To contribute:
-
-Fork the repository
-
-Create a new branch (feature/your-feature-name)
-
-Make your changes and commit
-
-Push to your fork and create a Pull Request
-
-
-
-
-
+- We welcome contributions! To contribute:
+- Fork the repository
+- Create a new branch (feature/your-feature-name)
+- Make your changes and commit
+- Push to your fork and create a Pull Request
 
 ### 📬 Contact & Credits
 
