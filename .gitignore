@@ -1,0 +1,50 @@
+# Python cache & build
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env/
+.env.bak/
+.venv/
+*.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Model files (keep only final loan_model.pkl if needed)
+*.pkl
+*.joblib
+
+# Streamlit
+.streamlit/
+
+# Results (optional – comment this if you want to keep results tracked)
+results/*.csv
+results/*.json
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# PyCharm
+*.iml
+
+# Coverage / testing
+.coverage
+.tox/
+.pytest_cache/
