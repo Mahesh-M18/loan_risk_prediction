@@ -5,6 +5,8 @@ import joblib
 # Load the saved Logistic Regression model
 model = joblib.load("loan_model.pkl")
 
+
+
 st.title("🏦 Loan Approval Prediction App")
 st.write("Fill in the details to check if your loan will be approved or not.")
 
