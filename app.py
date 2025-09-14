@@ -5,6 +5,8 @@ import joblib
 # Load the saved Logistic Regression model
 model = joblib.load("loan_model.pkl")
 
+
+
 st.title("🏦 Loan Approval Prediction App")
 st.write("Fill in the details to check if your loan will be approved or not.")
 
@@ -13,10 +15,11 @@ gender = st.selectbox("Gender", ["Male", "Female"])
 married = st.selectbox("Married", ["Yes", "No"])
 dependents = st.selectbox("Dependents", ["0", "1", "2", "3+"])
 education = st.selectbox("Education", ["Graduate", "Not Graduate"])
-self_employed = st.selectbox("Self_Employed", ["Yes", "No"])
-totalincome = st.number_input("TotalIncome", min_value=0)
+self_employed = st.selectbox("Self Employed", ["Yes", "No"])
+applicant_income = st.number_input("Applicant Income", min_value=0)
+coapplicant_income=st.number_input("Coapplicant Income",min_value=0)
 loan_amount = st.number_input("Loan Amount", min_value=0)
-loan_amount_term = st.number_input("Loan Amount Term (Months)", min_value=0)
+loan_amount_term = st.number_input("Loan Amount Term (in days)", min_value=0)
 credit_history = st.selectbox("Credit History", ["Yes","No"])
 property_area = st.selectbox("Property Area", ["Urban", "Semiurban", "Rural"])
 
@@ -27,9 +30,9 @@ data = {
     "Dependents": 3 if dependents == "3+" else int(dependents),
     "Education": 0 if education == "Graduate" else 1,
     "Self_Employed": 1 if self_employed == "Yes" else 0,
-    "TotalIncome": totalincome,
+    "TotalIncome": applicant_income+coapplicant_income,
     "LoanAmount": loan_amount,
-    "Loan_Amount_Term": loan_amount_term,
+    "Loan_Amount_Term": loan_amount_term//10,
     "Credit_History": 1 if credit_history=="Yes" else 0,
     "Property_Area": 0 if property_area == "Rural" else (1 if property_area == "Semiurban" else 2),
 }
