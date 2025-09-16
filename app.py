@@ -45,8 +45,8 @@ data = {
     "Education": 0 if education == "Graduate" else 1,
     "Self_Employed": 1 if self_employed == "Yes" else 0,
     "TotalIncome": applicant_income+coapplicant_income,
-    "LoanAmount": loan_amount // 1000,
-    "Loan_Amount_Term": loan_amount_term/10,
+    "LoanAmount": loan_amount,
+    "Loan_Amount_Term": loan_amount_term,
     "Credit_History": 1 if credit_history=="Yes" else 0,
     "Property_Area": 0 if property_area == "Rural" else (1 if property_area == "Semiurban" else 2),
 }
