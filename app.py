@@ -30,9 +30,9 @@ def check_loan_conditions(loan_amount, loan_amount_term, applicant_income, coapp
     monthly_limit = 0.75 * monthly_income
 
     if loan_amount < total_income:
-        return "✅ Loan Auto-Approved: Loan amount less than total income."
+        return "✅ Loan Approved: (Confidence:100%)"
     if emi >= monthly_limit:
-        return "❌ Loan Auto-Rejected: EMI exceeds 75% of monthly income."
+        return "❌ Loan Rejected: (Confidence:0%)"
 
     # None means no auto decision; continue to model prediction
     return None
